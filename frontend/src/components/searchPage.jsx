@@ -14,13 +14,23 @@ class SearchPage extends Component {
     this.setState({ searchText: evt.target.value });
   };
 
+  callback = (json) => {
+    let array = []
+    json.message.body.artist_list.forEach(element => array.push(element))
+    console.log(array)
+    this.setState({
+      artists: array
+    })
+  }
   handleSubmit = async (evt) => {
     evt.preventDefault();
     alert('You submitted a request');
-    const searchResults = await axios.get(`https://api.musixmatch.com/ws/1.1/artist.search?format=jsonp&callback=callback&q_artist=${this.state.searchText}&apikey=	05b96e13b7db11255012f495057b0ba9`)
-    console.log(searchResults.data)
+    const searchResults = await axios.get(`https://api.musixmatch.com/ws/1.1/artist.search?format=jsonp&callback=this.callback&q_artist=${this.state.searchText}&apikey=	05b96e13b7db11255012f495057b0ba9`)
+    // the following has a CORS error - why?
+    // const searchResults = await axios.get(`https://api.musixmatch.com/ws/1.1/artist.search?q_artist=prodigy&format=json&page_size=5&apikey=05b96e13b7db11255012f495057b0ba9`)
+    eval(searchResults.data)
     this.setState({ searchText: ''})
-    this.setState({artists: searchResults.data})
+
   };
 
   render() {
@@ -33,7 +43,7 @@ class SearchPage extends Component {
           onChange={this.handleChange}></input>
           <button className={styles.searchButton}>Search</button>
         </form>
-        <p>{this.state.artists}</p>
+        <p>{this.state.artists && this.state.artists.map(element => <p>{JSON.stringify(element)}</p>)}</p>
       </div>
     )
   };
